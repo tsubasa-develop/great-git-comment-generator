@@ -1,0 +1,7 @@
+{
+	"editor.formatOnSave": true,
+	"liveServer.settings.root": "/build",
+	"emmet.includeLanguages": {
+		"svelte": "html"
+	}
+}
