@@ -21,6 +21,7 @@
   let question = dummy_questions[Math.floor(Math.random() * dummy_questions.length)];
   let prefix_list: string[] = [];
   let answers = ["ここに結果が表示されます。"];
+  let isButtonDisabled = false;
 
   // API通信
   let promise: Promise<string[]> = Promise.resolve(answers);
@@ -35,6 +36,12 @@
       return result.data?.answers;
     }
     throw new Error("API Error");
+  };
+  const submit = async () => {
+    isButtonDisabled = true;
+    const response = await chat();
+    isButtonDisabled = false;
+    return response;
   };
 
   // マウント時に実行
@@ -54,7 +61,7 @@
     localStorage.setItem("prefix_settings", JSON.stringify({ data: prefix_list.join(",") }));
   };
   const handleSubmit = async () => {
-    promise = chat();
+    promise = submit();
   };
 </script>
 
@@ -78,7 +85,7 @@
         {/each}
       </div>
     </div>
-    <button type="button" class="btn btn-primary btn-lg mt-4" on:click|preventDefault={handleSubmit}>生成</button>
+    <button type="button" class="btn btn-primary btn-lg mt-4" disabled={isButtonDisabled} on:click|preventDefault={handleSubmit}>生成</button>
     <div class="form-group　my-5">
       <label for="answer">結果</label>
       <div class="mt-2">
