@@ -67,22 +67,24 @@
 
 <div class="container">
   <h1 class="mt-5">Good Git Comment Generator</h1>
-  <form class="mt-4">
+  <form class="mt-5">
     <div class="form-group">
-      <label for="question">実装内容</label>
+      <label for="question">接頭辞候補</label>
       <div class="mt-2">
-        <textarea class="form-control" id="question" rows="5" bind:value={question} />
+        <div class="row">
+          {#each prefix_pattern as prefix, i}
+            <div class="col-1 mx-2 form-check form-switch">
+              <input class="form-check-input" bind:group={prefix_list} value={prefix} name="prefix_group" type="checkbox" id={`prefix_${i}`} on:change={handleChange} />
+              <label class="form-check-label" for={`prefix_${i}`}>{prefix}</label>
+            </div>
+          {/each}
+        </div>
       </div>
     </div>
     <div class="form-group mt-4">
-      <label for="question">接頭辞候補</label>
+      <label for="question">実装内容</label>
       <div class="mt-2">
-        {#each prefix_pattern as prefix, i}
-          <div class="form-check form-switch">
-            <input class="form-check-input" bind:group={prefix_list} value={prefix} name="prefix_group" type="checkbox" id={`prefix_${i}`} on:change={handleChange} />
-            <label class="form-check-label" for={`prefix_${i}`}>{prefix}</label>
-          </div>
-        {/each}
+        <textarea class="form-control" id="question" rows="5" bind:value={question} />
       </div>
     </div>
     <button type="button" class="btn btn-primary btn-lg mt-4" disabled={isButtonDisabled} on:click|preventDefault={handleSubmit}>生成</button>
