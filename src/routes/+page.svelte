@@ -1,6 +1,10 @@
 <script lang="ts">
   import axios from "axios";
   import { onMount } from "svelte";
+  import "carbon-components-svelte/css/g80.css";
+  import { Form, FormGroup, Checkbox, Button } from "carbon-components-svelte";
+  import { TextInput, TextArea, TextInputSkeleton } from "carbon-components-svelte";
+  import { InlineLoading } from "carbon-components-svelte";
 
   // フォーム設定
   const prefix_pattern = ["fix", "feat", "chore", "update", "add", "docs"].map((v) => `${v}:`);
@@ -60,45 +64,50 @@
     // prefixの設定をローカルストレージに保存
     localStorage.setItem("prefix_settings", JSON.stringify({ data: prefix_list.join(",") }));
   };
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: Event) => {
+    e.preventDefault();
     promise = submit();
   };
 </script>
 
 <div class="container">
-  <h1 class="mt-5">Good Git Comment Generator</h1>
-  <form class="mt-5">
-    <div class="form-group">
-      <label for="question">接頭辞候補</label>
-      <div class="mt-2">
-        <div class="row">
-          {#each prefix_pattern as prefix, i}
-            <div class="col-1 mx-2 form-check form-switch">
-              <input class="form-check-input" bind:group={prefix_list} value={prefix} name="prefix_group" type="checkbox" id={`prefix_${i}`} on:change={handleChange} />
-              <label class="form-check-label" for={`prefix_${i}`}>{prefix}</label>
-            </div>
-          {/each}
-        </div>
-      </div>
-    </div>
-    <div class="form-group mt-4">
-      <label for="question">実装内容</label>
-      <div class="mt-2">
-        <textarea class="form-control" id="question" rows="5" bind:value={question} />
-      </div>
-    </div>
-    <button type="button" class="btn btn-primary btn-lg mt-4" disabled={isButtonDisabled} on:click|preventDefault={handleSubmit}>生成</button>
-    <div class="form-group　my-5">
-      <label for="answer">結果</label>
-      <div class="mt-2">
+  <div class="container__inn">
+    <h1>Good Git Comment Generator</h1>
+    <Form class="form" on:submit={handleSubmit}>
+      <FormGroup legendText="接頭辞候補">
+        {#each prefix_pattern as prefix, i}
+          <Checkbox bind:group={prefix_list} value={prefix} labelText={prefix} on:change={handleChange} />
+        {/each}
+      </FormGroup>
+      <FormGroup legendText="実装内容">
+        <TextArea bind:value={question} placeholder="実装内容を記入してください。" helperText="" />
+      </FormGroup>
+      <Button disabled={isButtonDisabled} type="submit">生成</Button>
+    </Form>
+    <Form class="result">
+      <FormGroup legendText="結果">
         {#await promise}
-          <input type="text" class="form-control" id="answer" value="通信中..." disabled />
+          <TextInputSkeleton hideLabel />
+          <InlineLoading description="通信中..." />
         {:then answers}
           {#each answers as answer, i}
-            <input type="text" class="form-control" class:mt-2={i !== 0} id="answer" value={answer} />
+            <TextInput value={answer} placeholder="" />
           {/each}
+          <InlineLoading status="finished" description="Success" />
+        {:catch error}
+          <TextInput disabled />
+          <InlineLoading status="error" description={error} />
         {/await}
-      </div>
-    </div>
-  </form>
+      </FormGroup>
+    </Form>
+  </div>
 </div>
+
+<style global>
+  .form {
+    margin-top: 40px;
+  }
+  .result {
+    margin-top: 40px;
+  }
+</style>

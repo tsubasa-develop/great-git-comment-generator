@@ -6,6 +6,9 @@ const debug = !true;
 
 const chat = async ({ content }: { content: string }): Promise<string> => {
   if (debug) {
+    // 3秒待つ
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // throw new Error("debug");
     return `feat: Implemented pagination for NEWS page list.\nchore: Cleaned up code related to NEWS page list pagination.\nupdate: Updated NEWS page list with pagination functionality.`;
   }
   const configuration = new Configuration({
