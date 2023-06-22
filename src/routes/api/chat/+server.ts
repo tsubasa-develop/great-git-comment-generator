@@ -2,7 +2,7 @@ import { Configuration, OpenAIApi } from "openai";
 import { OPENAI_API_KEY } from "$env/static/private";
 import type { RequestHandler } from "../$types";
 
-const debug = !true;
+const debug = true;
 
 const chat = async ({ content }: { content: string }): Promise<string> => {
   if (debug) {
