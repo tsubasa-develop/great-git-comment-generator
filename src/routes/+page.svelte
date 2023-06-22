@@ -8,7 +8,7 @@
   import { InlineLoading } from "carbon-components-svelte";
 
   // フォーム設定
-  const type_list = ["comment", "blanch"];
+  const type_list = ["comment", "branch"] as const;
   const prefix_pattern = ["fix", "feat", "chore", "update", "add", "docs"].map((v) => `${v}:`);
   const dummy_questions = [
     "バグ: ドロップダウンメニューの選択が正しく反映されない - ユーザーの選択が正しく表示されないまたは保存されない場合の問題。",
@@ -25,8 +25,9 @@
 
   // フォーム初期値
   let question = dummy_questions[Math.floor(Math.random() * dummy_questions.length)];
-  let select_type = type_list[0];
+  let type = type_list[0];
   let prefix_list: string[] = [];
+  let prefix_branch: string = "";
   let answers = ["ここに結果が表示されます。"];
   let isButtonDisabled = false;
 
@@ -37,6 +38,8 @@
       params: {
         question,
         prefix_list,
+        prefix_branch,
+        type,
       },
     });
     if (result.status === 200) {
@@ -78,17 +81,22 @@
     <h1>Good Git Comment Generator</h1>
     <Form class="form" on:submit={handleSubmit}>
       <FormGroup legendText="タイプ選択">
-        <RadioButtonGroup bind:selected={select_type}>
+        <RadioButtonGroup bind:selected={type}>
           {#each type_list as value}
             <RadioButton labelText={value} {value} />
           {/each}
         </RadioButtonGroup>
       </FormGroup>
-      {#if select_type === "comment"}
+      {#if type === "comment"}
         <FormGroup legendText="接頭辞候補">
           {#each prefix_pattern as prefix, i}
             <Checkbox bind:group={prefix_list} value={prefix} labelText={prefix} on:change={handleChange} />
           {/each}
+        </FormGroup>
+      {/if}
+      {#if type === "branch"}
+        <FormGroup legendText="接頭辞入力">
+          <TextInput value={prefix_branch} placeholder="feature/などの指定があれば入力" />
         </FormGroup>
       {/if}
       <FormGroup legendText="実装内容">
