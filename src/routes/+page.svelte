@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import "carbon-components-svelte/css/g80.css";
   import { Form, FormGroup, Checkbox, Button } from "carbon-components-svelte";
-  import { TextInput, TextArea, TextInputSkeleton } from "carbon-components-svelte";
+  import { CopyButton, TextInput, TextArea, TextInputSkeleton } from "carbon-components-svelte";
   import { RadioButtonGroup, RadioButton } from "carbon-components-svelte";
   import { InlineLoading } from "carbon-components-svelte";
 
@@ -89,9 +89,9 @@
         </RadioButtonGroup>
       </FormGroup>
       {#if type === "comment"}
-        <FormGroup legendText="接頭辞候補">
+        <FormGroup legendText="接頭辞候補" class="checkboxes">
           {#each prefix_pattern as prefix}
-            <Checkbox bind:group={prefix_comment} value={prefix} labelText={prefix} on:change={handleChange} />
+            <Checkbox class="checkbox" bind:group={prefix_comment} value={prefix} labelText={prefix} on:change={handleChange} />
           {/each}
         </FormGroup>
       {/if}
@@ -111,9 +111,14 @@
           <TextInputSkeleton hideLabel />
           <InlineLoading description="通信中..." />
         {:then answers}
-          {#each answers as answer, i}
-            <TextInput value={answer} placeholder="" />
-          {/each}
+          <div class="answer">
+            {#each answers as answer}
+              <div class="answer-inn">
+                <CopyButton text={answer} feedback="コピーしました。" />
+                <TextInput value={answer} placeholder="" />
+              </div>
+            {/each}
+          </div>
           <InlineLoading status="finished" description="Success" />
         {:catch error}
           <TextInput disabled />
@@ -128,7 +133,26 @@
   .form {
     margin-top: 40px;
   }
+  .checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .checkbox {
+    margin-top: 0 !important;
+    max-width: fit-content;
+  }
   .result {
     margin-top: 40px;
+  }
+  .answer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .answer-inn {
+    display: flex;
+    width: 100%;
+    gap: 5px;
   }
 </style>
