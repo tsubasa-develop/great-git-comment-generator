@@ -79,7 +79,7 @@
 
 <div class="container">
   <div class="container__inn">
-    <h1>Good Git Comment Generator</h1>
+    <h1>Git Guru Echo</h1>
     <Form class="form" on:submit={handleSubmit}>
       <FormGroup legendText="タイプ選択">
         <RadioButtonGroup bind:selected={type} on:change={handleChange}>
