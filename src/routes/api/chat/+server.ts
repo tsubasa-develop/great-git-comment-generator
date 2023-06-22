@@ -24,15 +24,14 @@ const chat = async ({ content }: { content: string }): Promise<string> => {
 
 export const POST = (async ({ request }) => {
   const res = await request.json();
-  const { question, prefix_list, prefix_branch, type } = res.params;
-  console.log(res.params);
+  const { question, prefix_comment, prefix_branch, type } = res.params;
   const max_answer = 3;
   const content = (() => {
     switch (type) {
       case "comment":
         return [
           `次のような実装を行った。このプロジェクトはgitで管理を行なっており、この変更をcommitしたい。英語でgit commentを考えて。`,
-          `接頭辞として ${prefix_list.join(
+          `接頭辞として ${prefix_comment.join(
             " "
           )} の中から最も適した接頭辞を選んで。`,
           `出力形式はgit commentのみで接頭辞から必ず開始すること。接頭辞から開始しない回答は認めない。`,
@@ -47,6 +46,7 @@ export const POST = (async ({ request }) => {
           `fix: Refresh image and resize to improve visibility`,
         ].join("\n");
       case "branch":
+        console.log(prefix_branch, !!prefix_branch);
         return [
           `次のような実装を行う。このプロジェクトはgitで管理を行なっており、作業をする際、新たにブランチを作成する。この作業ブランチの名前を英語で考えて。`,
           `回答は${max_answer}種類まで出力し、改行で区切って。`,

@@ -8,7 +8,7 @@
   import { InlineLoading } from "carbon-components-svelte";
 
   // フォーム設定
-  const type_list = ["comment", "branch"] as const;
+  const type_list = ["comment", "branch"];
   const prefix_pattern = ["fix", "feat", "chore", "update", "add", "docs"].map((v) => `${v}:`);
   const dummy_questions = [
     "バグ: ドロップダウンメニューの選択が正しく反映されない - ユーザーの選択が正しく表示されないまたは保存されない場合の問題。",
@@ -26,7 +26,7 @@
   // フォーム初期値
   let question = dummy_questions[Math.floor(Math.random() * dummy_questions.length)];
   let type = type_list[0];
-  let prefix_list: string[] = [];
+  let prefix_comment: string[] = [];
   let prefix_branch: string = "";
   let answers = ["ここに結果が表示されます。"];
   let isButtonDisabled = false;
@@ -37,7 +37,7 @@
     const result = await axios.post("/api/chat", {
       params: {
         question,
-        prefix_list,
+        prefix_comment,
         prefix_branch,
         type,
       },
@@ -56,19 +56,20 @@
 
   // マウント時に実行
   onMount(() => {
-    // prefixの設定をローカルストレージから取得
-    const prefix_settings = localStorage.getItem("prefix_settings");
-    if (prefix_settings) {
-      prefix_list = JSON.parse(prefix_settings).data.split(",") || [...prefix_pattern];
-    } else {
-      prefix_list = [...prefix_pattern];
+    // 初期設定をローカルストレージから取得
+    const form_config = localStorage.getItem("form_config");
+    if (form_config && JSON.parse(form_config)) {
+      const _form_config = JSON.parse(form_config);
+      type = _form_config.type || type_list[0];
+      prefix_comment = _form_config.prefix_comment || [];
+      prefix_branch = _form_config.prefix_branch || "";
     }
   });
 
   // ハンドリング
   const handleChange = () => {
     // prefixの設定をローカルストレージに保存
-    localStorage.setItem("prefix_settings", JSON.stringify({ data: prefix_list.join(",") }));
+    localStorage.setItem("form_config", JSON.stringify({ type, prefix_comment, prefix_branch }));
   };
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -81,7 +82,7 @@
     <h1>Good Git Comment Generator</h1>
     <Form class="form" on:submit={handleSubmit}>
       <FormGroup legendText="タイプ選択">
-        <RadioButtonGroup bind:selected={type}>
+        <RadioButtonGroup bind:selected={type} on:change={handleChange}>
           {#each type_list as value}
             <RadioButton labelText={value} {value} />
           {/each}
@@ -89,14 +90,14 @@
       </FormGroup>
       {#if type === "comment"}
         <FormGroup legendText="接頭辞候補">
-          {#each prefix_pattern as prefix, i}
-            <Checkbox bind:group={prefix_list} value={prefix} labelText={prefix} on:change={handleChange} />
+          {#each prefix_pattern as prefix}
+            <Checkbox bind:group={prefix_comment} value={prefix} labelText={prefix} on:change={handleChange} />
           {/each}
         </FormGroup>
       {/if}
       {#if type === "branch"}
         <FormGroup legendText="接頭辞入力">
-          <TextInput value={prefix_branch} placeholder="feature/などの指定があれば入力" />
+          <TextInput bind:value={prefix_branch} placeholder="feature/などの指定があれば入力" on:change={handleChange} />
         </FormGroup>
       {/if}
       <FormGroup legendText="実装内容">
