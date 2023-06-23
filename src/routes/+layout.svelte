@@ -10,7 +10,7 @@
   } from "carbon-components-svelte";
 </script>
 
-<Header company="" platformName="GitGuruEcho">
+<Header company="" platformName="Git Guru Echo">
   <svelte:fragment slot="skip-to-content">
     <SkipToContent />
   </svelte:fragment>
