@@ -110,7 +110,6 @@ export const POST = (async ({ request }) => {
       return true;
     })
     .filter((v) => !!v);
-  console.log({ answers });
   const body = {
     question: question || "",
     answers,
