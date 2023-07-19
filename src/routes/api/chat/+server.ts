@@ -44,9 +44,11 @@ export const POST = (async ({ request }) => {
     switch (type) {
       case "comment":
         const example = prefix_comment.flatMap((prefix) => {
-          return new Array(max_answer).fill(
-            `${prefix} Description of implementation content to avoid duplication.`
-          );
+          return [
+            `${prefix} hogehogehoge.`,
+            `${prefix} fugafugafuga.`,
+            `${prefix} piyopiyopiyo.`,
+          ];
         });
         return [
           ...[
@@ -76,10 +78,10 @@ export const POST = (async ({ request }) => {
             !!prefix_branch ? prefix_branch + "/" : ""
           }update_type_label_format`,
           `${
-            !!prefix_branch ? prefix_branch + "/" : "feature/"
+            !!prefix_branch ? prefix_branch + "/" : "feature"
           }fix_type_label_format`,
           `${
-            !!prefix_branch ? prefix_branch + "/" : "docs/"
+            !!prefix_branch ? prefix_branch + "/" : "docs"
           }update_type_label_format`,
           `------------------------------`,
           `${question}`,
@@ -92,13 +94,10 @@ export const POST = (async ({ request }) => {
   const response = await chat({ content });
   // 改行で区切られていることが期待されるため、配列で返す
   const temp = response.split("\n");
-  const answers = new Array(max_answer)
+  const originalAnswers = new Array(max_answer)
     .fill("")
-    .map((_, i) => temp[i] || "")
-    .filter((v, _, ary) => {
-      // 重複した内容があれば削除
-      return ary.indexOf(v) === ary.lastIndexOf(v);
-    })
+    .map((_, i) => temp[i] || "");
+  const answers = [...new Set(originalAnswers)]
     .filter((v) => {
       if (type === "comment") {
         return prefix_comment.some((prefix) => v.startsWith(prefix));
